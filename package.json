@@ -1,0 +1,42 @@
+{
+  "name": "bedrock-rsvp",
+  "version": "0.0.1-0",
+  "description": "Bedrock RSVP",
+  "main": "./lib/index.js",
+  "scripts": {
+    "lint": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/digitalbazaar/bedrock-rsvp"
+  },
+  "keywords": [
+    "bedrock"
+  ],
+  "author": {
+    "name": "Digital Bazaar, Inc.",
+    "email": "support@digitalbazaar.com",
+    "url": "https://digitalbazaar.com/"
+  },
+  "bugs": {
+    "url": "https://github.com/digitalbazaar/bedrock-rsvp/issues"
+  },
+  "homepage": "https://github.com/digitalbazaar/bedrock-rsvp",
+  "dependencies": {
+    "bnid": "^2.0.0",
+    "esm": "^3.2.25"
+  },
+  "peerDependencies": {
+    "bedrock-mongodb": "^7.0.0"
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "devDependencies": {
+    "eslint": "^7.1.0",
+    "eslint-config-digitalbazaar": "^2.5.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
