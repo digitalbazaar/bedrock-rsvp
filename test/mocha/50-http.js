@@ -5,9 +5,10 @@
 
 const axios = require('axios');
 const brHttpsAgent = require('bedrock-https-agent');
-const {config} = require('bedrock');
+const {config, util: {clone, delay}} = require('bedrock');
 const helpers = require('./helpers');
 const {httpClient} = require('@digitalbazaar/http-client');
+const mockData = require('./mock-data');
 
 const {baseUri} = config.server;
 const root = `${baseUri}/rsvps`;
@@ -50,31 +51,67 @@ describe('RSVP HTTP API', () => {
     // This test uses HTTP.GET instead of the EventSource API which is used
     // in a browser. This works fine provided there is only on message
     // passed in the stream as with the use case here.
-    it('listens for an RSVP response', async () => {
+    it.only('listens for an RSVP response', async () => {
       // get the RSVP URL from the request
       const {url} = request;
 
-      let result;
       let err;
+      let testResult;
       try {
-        const {agent} = brHttpsAgent;
-        result = await httpClient.get(url, {agent});
+        testResult = await Promise.all([
+          // setup a listener for the RSVP
+          (async () => {
+            let result;
+            let err;
+            try {
+              const {agent} = brHttpsAgent;
+              result = await httpClient.get(url, {agent});
+            } catch(e) {
+              err = e;
+            }
+            assertNoError(err);
+            const response = await result.text();
+            const responseJson = JSON.parse(
+              response.substr(response.indexOf('{')));
+            should.exist(responseJson);
+            responseJson.should.have.keys([
+              '@context',
+              'type',
+              'summary',
+              'actor',
+              'object',
+            ]);
+            responseJson.should.eql(mockData.rsvpResponses.alpha);
+            return true;
+          })(),
+          // make an RSVP response
+          (async () => {
+            // allow time for the listener to register itself
+            await delay(200);
+
+            const rsvpResponse = clone(mockData.rsvpResponses.alpha);
+            let result;
+            let err;
+            try {
+              const {agent} = brHttpsAgent;
+              result = await httpClient.post(url, {agent, json: rsvpResponse});
+            } catch(e) {
+              err = e;
+            }
+            assertNoError(err);
+            const {data} = result;
+            data.success.should.be.true;
+            return true;
+          })()
+        ]);
       } catch(e) {
         err = e;
       }
       assertNoError(err);
-      const response = await result.text();
-      const responseJson = JSON.parse(response.substr(response.indexOf('{')));
-      should.exist(responseJson);
-      responseJson.should.have.keys([
-        '@context',
-        'type',
-        'summary',
-        'actor',
-        'object',
-      ]);
+      should.exist(testResult);
+      testResult.every(r => r).should.be.true;
     });
-  });
+  }); // end rsvp host listener
 
   describe('rsvp endpoint', () => {
     let request;
