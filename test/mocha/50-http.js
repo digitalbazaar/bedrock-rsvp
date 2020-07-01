@@ -4,8 +4,10 @@
 'use strict';
 
 const axios = require('axios');
-const {httpsAgent} = require('bedrock-https-agent');
+const brHttpsAgent = require('bedrock-https-agent');
 const {config} = require('bedrock');
+const helpers = require('./helpers');
+const {httpClient} = require('@digitalbazaar/http-client');
 
 const {baseUri} = config.server;
 const root = `${baseUri}/rsvps`;
@@ -23,6 +25,7 @@ describe('RSVP HTTP API', () => {
         type: 'someType',
       };
       try {
+        const {httpsAgent} = brHttpsAgent;
         result = await axios.post(root, payload, {httpsAgent});
       } catch(e) {
         err = e;
@@ -38,15 +41,45 @@ describe('RSVP HTTP API', () => {
     });
   }); // end rsvps endpoint
 
+  describe('rsvp host listener', () => {
+    let request;
+    before(async () => {
+      (request = await helpers.createRsvp({url: root}));
+    });
+
+    // This test uses HTTP.GET instead of the EventSource API which is used
+    // in a browser. This works fine provided there is only on message
+    // passed in the stream as with the use case here.
+    it('listens for an RSVP response', async () => {
+      // get the RSVP URL from the request
+      const {url} = request;
+
+      let result;
+      let err;
+      try {
+        const {agent} = brHttpsAgent;
+        result = await httpClient.get(url, {agent});
+      } catch(e) {
+        err = e;
+      }
+      assertNoError(err);
+      const response = await result.text();
+      const responseJson = JSON.parse(response.substr(response.indexOf('{')));
+      should.exist(responseJson);
+      responseJson.should.have.keys([
+        '@context',
+        'type',
+        'summary',
+        'actor',
+        'object',
+      ]);
+    });
+  });
+
   describe('rsvp endpoint', () => {
     let request;
     before(async () => {
-      const payload = {
-        // 5 minutes
-        ttl: 300000,
-        type: 'someType',
-      };
-      ({data: request} = await axios.post(root, payload, {httpsAgent}));
+      (request = await helpers.createRsvp({url: root}));
     });
     it('sends a response to the rsvp endpoint', async () => {
       let result;
@@ -56,6 +89,7 @@ describe('RSVP HTTP API', () => {
         url: 'https://example.com/3252335',
       };
       try {
+        const {httpsAgent} = brHttpsAgent;
         result = await axios.post(url, payload, {httpsAgent});
       } catch(e) {
         err = e;
@@ -73,6 +107,7 @@ describe('RSVP HTTP API', () => {
         url: 'https://example.com/3252335',
       };
       try {
+        const {httpsAgent} = brHttpsAgent;
         result = await axios.post(url, payload, {httpsAgent});
       } catch(e) {
         err = e;

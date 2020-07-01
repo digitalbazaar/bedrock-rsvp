@@ -9,10 +9,11 @@
     "coverage-report": "nyc report"
   },
   "dependencies": {
+    "@digitalbazaar/http-client": "^1.0.0",
     "axios": "^0.19.2",
     "bedrock": "^3.1.1",
     "bedrock-express": "^3.1.0",
-    "bedrock-https-agent": "^1.0.1",
+    "bedrock-https-agent": "^1.1.0",
     "bedrock-mongodb": "digitalbazaar/bedrock-mongodb#driver3",
     "bedrock-rsvp": "file:..",
     "bedrock-server": "^2.4.1",
