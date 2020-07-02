@@ -23,10 +23,12 @@
   },
   "homepage": "https://github.com/digitalbazaar/bedrock-rsvp",
   "dependencies": {
+    "@digitalbazaar/http-client": "^1.0.0",
     "bnid": "^2.0.0",
     "esm": "^3.2.25"
   },
   "peerDependencies": {
+    "bedrock-https-agent": "^1.1.0",
     "bedrock-mongodb": "^7.0.0"
   },
   "directories": {

@@ -51,7 +51,7 @@ describe('RSVP HTTP API', () => {
     // This test uses HTTP.GET instead of the EventSource API which is used
     // in a browser. This works fine provided there is only on message
     // passed in the stream as with the use case here.
-    it.only('listens for an RSVP response', async () => {
+    it('listens for an RSVP response', async () => {
       // get the RSVP URL from the request
       const {url} = request;
 
@@ -118,7 +118,7 @@ describe('RSVP HTTP API', () => {
     before(async () => {
       (request = await helpers.createRsvp({url: root}));
     });
-    it('sends a response to the rsvp endpoint', async () => {
+    it('responds with InvalidStateError on listener not found', async () => {
       let result;
       let err;
       const {url} = request;
@@ -126,13 +126,24 @@ describe('RSVP HTTP API', () => {
         url: 'https://example.com/3252335',
       };
       try {
-        const {httpsAgent} = brHttpsAgent;
-        result = await axios.post(url, payload, {httpsAgent});
+        const {agent} = brHttpsAgent;
+        result = await httpClient.post(url, {agent, json: payload});
       } catch(e) {
         err = e;
       }
-      assertNoError(err);
-      should.exist(result);
+      should.not.exist(result);
+      should.exist(err);
+      err.status.should.equal(400);
+      should.exist(err.data);
+      err.data.should.eql({
+        message: 'The RSVP listener was not found.',
+        type: 'InvalidStateError',
+        details: {
+          httpStatusCode: 400,
+          rsvpId: url.substr(url.lastIndexOf('/') + 1)
+        },
+        cause: null
+      });
     });
     it('responds with 404 on unknown rsvpId', async () => {
       let result;
