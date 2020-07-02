@@ -3,7 +3,6 @@
  */
 'use strict';
 
-const axios = require('axios');
 const brHttpsAgent = require('bedrock-https-agent');
 const {config, util: {clone, delay}} = require('bedrock');
 const helpers = require('./helpers');
@@ -26,8 +25,8 @@ describe('RSVP HTTP API', () => {
         type: 'someType',
       };
       try {
-        const {httpsAgent} = brHttpsAgent;
-        result = await axios.post(root, payload, {httpsAgent});
+        const {agent} = brHttpsAgent;
+        result = await httpClient.post(root, {agent, json: payload});
       } catch(e) {
         err = e;
       }
@@ -155,16 +154,16 @@ describe('RSVP HTTP API', () => {
         url: 'https://example.com/3252335',
       };
       try {
-        const {httpsAgent} = brHttpsAgent;
-        result = await axios.post(url, payload, {httpsAgent});
+        const {agent} = brHttpsAgent;
+        result = await httpClient.post(url, {agent, json: payload});
       } catch(e) {
         err = e;
       }
       should.not.exist(result);
       should.exist(err);
-      err.response.status.should.equal(404);
-      should.exist(err.response.data);
-      const {response: {data}} = err;
+      err.status.should.equal(404);
+      should.exist(err.data);
+      const {data} = err;
       data.should.be.an('object');
       data.type.should.equal('NotFoundError');
       data.details.rsvpId.should.equal(url.substr(url.lastIndexOf('/') + 1));

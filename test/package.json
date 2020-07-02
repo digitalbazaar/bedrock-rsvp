@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@digitalbazaar/http-client": "^1.0.0",
-    "axios": "^0.19.2",
     "bedrock": "^3.1.1",
     "bedrock-express": "^3.1.0",
     "bedrock-https-agent": "^1.1.0",
