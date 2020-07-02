@@ -13,7 +13,7 @@
     "bedrock": "^3.1.1",
     "bedrock-express": "^3.1.0",
     "bedrock-https-agent": "^1.1.0",
-    "bedrock-mongodb": "digitalbazaar/bedrock-mongodb#driver3",
+    "bedrock-mongodb": "^7.1.0",
     "bedrock-rsvp": "file:..",
     "bedrock-server": "^2.4.1",
     "bedrock-test": "^5.3.0",

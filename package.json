@@ -29,7 +29,7 @@
   },
   "peerDependencies": {
     "bedrock-https-agent": "^1.1.0",
-    "bedrock-mongodb": "^7.0.0"
+    "bedrock-mongodb": "^7.1.0"
   },
   "directories": {
     "lib": "./lib"
