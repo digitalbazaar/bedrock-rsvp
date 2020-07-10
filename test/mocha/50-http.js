@@ -129,9 +129,9 @@ describe('RSVP HTTP API', () => {
         }
         // register a mock listener registered on a mock endpoint
         const listener = {
-          // although nock is handling this request, `domain` must be a valid
+          // although nock is handling this request, `host` must be a valid
           // DNS hostname
-          domain: 'example.com',
+          hostname: 'example.com',
           port: 443,
           protocol: 'https://',
         };
@@ -144,7 +144,7 @@ describe('RSVP HTTP API', () => {
         assertNoError(err);
       }
     });
-    it('successfully proxies a request to another host', async () => {
+    it('successfully proxies a request to another hostname', async () => {
       // get the RSVP URL from the request
       const {url} = requests[0];
       const rsvpResponse = clone(mockData.rsvpResponses.alpha);
