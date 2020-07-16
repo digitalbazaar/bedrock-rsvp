@@ -41,7 +41,7 @@ describe('RSVP HTTP API', () => {
     });
   }); // end rsvps endpoint
 
-  describe('rsvp host listener', () => {
+  describe('rsvp host listener HTTP GET', () => {
     let request;
     before(async () => {
       (request = await helpers.createRsvp({url: root}));
@@ -102,6 +102,67 @@ describe('RSVP HTTP API', () => {
             data.success.should.be.true;
             return true;
           })()
+        ]);
+      } catch(e) {
+        err = e;
+      }
+      assertNoError(err);
+      should.exist(testResult);
+      testResult.every(r => r).should.be.true;
+    });
+  }); // end rsvp host listener
+
+  describe('rsvp host listener HTTP GET expiration', () => {
+    let request;
+    before(async () => {
+      const ttlSave = config.rsvp.ttl;
+      // this will create an RSVP with a very short ttl
+      config.rsvp.ttl = 500;
+      (request = await helpers.createRsvp({url: root}));
+      config.rsvp.ttl = ttlSave;
+    });
+
+    // This test uses HTTP.GET instead of the EventSource API which is used
+    // in a browser. This works fine provided there is only on message
+    // passed in the stream as with the use case here.
+    it('RSVP expires before response is received', async () => {
+      // get the RSVP URL from the request
+      const {url} = request;
+
+      let err;
+      let testResult;
+      try {
+        testResult = await Promise.all([
+          // setup a listener for the RSVP
+          (async () => {
+            let result;
+            let err;
+            try {
+              const {agent} = brHttpsAgent;
+              result = await httpClient.get(url, {agent});
+            } catch(e) {
+              err = e;
+            }
+            assertNoError(err);
+            // success status because the stream was established successfully
+            result.status.should.equal(200);
+            const response = await result.text();
+            const responseJson = JSON.parse(
+              response.substr(response.indexOf('{')));
+            should.exist(responseJson);
+            responseJson.should.have.keys([
+              '@context',
+              'type',
+              'message',
+              'rsvpId',
+            ]);
+            const rsvpId = url.substr(url.lastIndexOf('/') + 1);
+            responseJson.should.eql({
+              ...mockData.rsvpResponses.beta,
+              rsvpId,
+            });
+            return true;
+          })(),
         ]);
       } catch(e) {
         err = e;

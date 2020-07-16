@@ -23,4 +23,10 @@ mocks.rsvpResponses = {
       url: 'https://acme.example.com/checkout/32f326g364gf3'
     }
   },
+  beta: {
+    '@context': 'urn:someContext',
+    type: 'Error',
+    message: 'The RSVP has expired.',
+    rsvpId: 'REPLACE_ME'
+  }
 };
