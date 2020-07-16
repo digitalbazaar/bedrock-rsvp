@@ -22,8 +22,6 @@ describe('RSVP HTTP API', () => {
       let result;
       let err;
       const payload = {
-        // 5 minutes
-        ttl: 300000,
         type: 'someType',
       };
       try {
