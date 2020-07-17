@@ -43,7 +43,7 @@ describe('RSVP HTTP API', () => {
 
   describe('rsvp host listener HTTP GET', () => {
     let request;
-    before(async () => {
+    beforeEach(async () => {
       (request = await helpers.createRsvp({url: root}));
     });
 
@@ -109,6 +109,66 @@ describe('RSVP HTTP API', () => {
       assertNoError(err);
       should.exist(testResult);
       testResult.every(r => r).should.be.true;
+    });
+
+    it('responds with errors when reusing a completed RSVP', async () => {
+      // get the RSVP URL from the request
+      const {url} = request;
+      const {agent} = brHttpsAgent;
+      // execute a successful RSVP round-trip
+      let err;
+      let testResult;
+      try {
+        testResult = await Promise.all([
+          // setup a listener for the RSVP
+          (async () => {
+            await httpClient.get(url, {agent});
+            return true;
+          })(),
+          // make an RSVP response
+          (async () => {
+            // allow time for the listener to register itself
+            await delay(200);
+            const rsvpResponse = clone(mockData.rsvpResponses.alpha);
+            await httpClient.post(url, {agent, json: rsvpResponse});
+            return true;
+          })()
+        ]);
+      } catch(e) {
+        err = e;
+      }
+      assertNoError(err);
+      should.exist(testResult);
+      testResult.every(r => r).should.be.true;
+
+      // an attempt to setup a listener for the same RSVP again should fail
+      err = null;
+      let result;
+      try {
+        result = await httpClient.get(url, {agent});
+      } catch(e) {
+        err = e;
+      }
+      should.not.exist(result);
+      should.exist(err);
+      should.exist(err.data);
+      // the RSVP is deleted after a successful round-trip
+      err.data.type.should.equal('NotFoundError');
+
+      // an attempt to send a response to the same RSVP again should fail
+      const rsvpResponse = clone(mockData.rsvpResponses.alpha);
+      err = null;
+      result = null;
+      try {
+        await httpClient.post(url, {agent, json: rsvpResponse});
+      } catch(e) {
+        err = e;
+      }
+      should.not.exist(result);
+      should.exist(err);
+      should.exist(err.data);
+      // the RSVP is deleted after a successful round-trip
+      err.data.type.should.equal('NotFoundError');
     });
   }); // end rsvp host listener
 
