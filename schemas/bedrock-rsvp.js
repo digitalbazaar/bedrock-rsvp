@@ -3,5 +3,5 @@
  */
 import rsvpSpec from '@digitalbazaar/rsvp-spec';
 
-export const document = () => rsvpSpec.rsvp.schemas.document;
+export const postRsvpRequest = () => rsvpSpec.rsvp.schemas.document;
 
