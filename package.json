@@ -24,6 +24,7 @@
   "homepage": "https://github.com/digitalbazaar/bedrock-rsvp",
   "dependencies": {
     "@digitalbazaar/http-client": "^1.0.0",
+    "@digitalbazaar/rsvp-spec": "github:digitalbazaar/rsvp-spec#initial",
     "bnid": "^2.0.0",
     "cors": "^2.8.5",
     "esm": "^3.2.25"
@@ -31,7 +32,8 @@
   "peerDependencies": {
     "bedrock-https-agent": "^1.1.0",
     "bedrock-express": "3.2.0",
-    "bedrock-mongodb": "^7.1.0"
+    "bedrock-mongodb": "^7.1.0",
+    "bedrock-validation": "^4.4.0"
   },
   "directories": {
     "lib": "./lib"
