@@ -27,7 +27,8 @@
     "@digitalbazaar/rsvp-spec": "github:digitalbazaar/rsvp-spec#initial",
     "bnid": "^2.0.0",
     "cors": "^2.8.5",
-    "esm": "^3.2.25"
+    "esm": "^3.2.25",
+    "express-rate-limit": "^5.1.3"
   },
   "peerDependencies": {
     "bedrock-https-agent": "^1.1.0",
